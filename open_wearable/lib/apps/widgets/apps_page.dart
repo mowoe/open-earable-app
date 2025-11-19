@@ -7,6 +7,7 @@ import 'package:open_wearable/apps/posture_tracker/model/earable_attitude_tracke
 import 'package:open_wearable/apps/posture_tracker/view/posture_tracker_view.dart';
 import 'package:open_wearable/apps/widgets/select_earable_view.dart';
 import 'package:open_wearable/apps/widgets/app_tile.dart';
+import 'package:open_wearable/apps/eargpt_gemini_live/widgets/eargpt_sensor_debug_page.dart';
 
 import '../../widgets/devices/connect_devices_page.dart';
 
@@ -50,7 +51,6 @@ List<AppInfo> _apps = [
           Sensor ppgSensor = (wearable as SensorManager).sensors.firstWhere(
             (s) => s.sensorName.toLowerCase() == "photoplethysmography".toLowerCase(),
           );
-
           return HeartTrackerPage(ppgSensor: ppgSensor);
         }
         return PlatformScaffold(
@@ -64,6 +64,32 @@ List<AppInfo> _apps = [
       },
     ),
   ),
+  AppInfo(
+    logoPath: "lib/apps/eargpt_gemini_live/assets/logo.png",
+    title: "EarGPT Sensor Demo",
+    description: "Demo app for getting Sensor data into EarGPT Gemini Live",
+    widget: SelectEarableView(startApp: 
+      (wearable, _) {
+        if (wearable is SensorManager) {
+          Sensor ppgSensor = (wearable as SensorManager).sensors.firstWhere(
+            (s) => s.sensorName.toLowerCase() == "photoplethysmography".toLowerCase(),
+          );
+          return EargptSensorDebugPage(ppgSensor: ppgSensor);
+        }
+
+        return PlatformScaffold(
+          appBar: PlatformAppBar(
+            title: PlatformText("EarGPT Sensor Demo"),
+          ),
+          body: Center(
+            child: PlatformText("No PPG Sensor Found"),
+          ),
+        );
+
+      }
+    )
+    // EargptSensorDebugPage(ppgSensor: null)
+  )
 ];
 
 class AppsPage extends StatelessWidget {

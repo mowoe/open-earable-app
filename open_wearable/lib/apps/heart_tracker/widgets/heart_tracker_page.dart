@@ -46,9 +46,11 @@ class _HeartTrackerPageState extends State<HeartTrackerPage> {
       }
 
       setState(() {
+        logger.w("Here!");
         ppgFilter = PpgFilter(
           inputStream: sensor.sensorStream.asyncMap((data) {
             SensorDoubleValue sensorData = data as SensorDoubleValue;
+            logger.i("Received PPG Data: ${sensorData.values} at ${sensorData.timestamp}");
             return (
               sensorData.timestamp,
               -(sensorData.values[2] + sensorData.values[3])
@@ -57,6 +59,7 @@ class _HeartTrackerPageState extends State<HeartTrackerPage> {
           sampleFreq: sampleFreq,
           timestampExponent: sensor.timestampExponent,
         );
+        logger.w("ppgFilter init done!");
       });
     });
   }

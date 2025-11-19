@@ -50,6 +50,29 @@ class _SelectEarableViewState extends State<SelectEarableView> {
               ),
 
               PlatformElevatedButton(
+                child: PlatformText("Start App without Earable"),
+                onPressed: () {
+                  _selectedWearable = null;
+                  Navigator.push(
+                    context,
+                    platformPageRoute(
+                      context: context,
+                      builder: (context) {
+                        return ChangeNotifierProvider.value(
+                          value: wearablesProvider.getSensorConfigurationProvider(_selectedWearable!),
+                          child: widget.startApp(
+                            _selectedWearable!, 
+                            wearablesProvider.getSensorConfigurationProvider(_selectedWearable!),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                  
+                },
+              ),
+
+              PlatformElevatedButton(
                 child: PlatformText("Start App"),
                 onPressed: () {
                   if (_selectedWearable != null) {

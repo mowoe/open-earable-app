@@ -59,7 +59,8 @@ class _HomePageState extends State<HomePage> {
         if (constraints.maxWidth < 600) {
           return _buildSmallScreenLayout(context);
         } else {
-          return _buildLargeScreenLayout(context);
+          return _buildSmallScreenLayout(context);
+          //return _buildLargeScreenLayout(context);
         }
       },
     );
