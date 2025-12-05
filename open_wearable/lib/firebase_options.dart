@@ -25,9 +25,15 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
-        return windows;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for windows - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -40,47 +46,31 @@ class DefaultFirebaseOptions {
     }
   }
 
+  /// API keys here are for project identification, not authorization.
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyABlFDGt2_8ObSQlrPBcQ83NHt21RcUpq8',
-    appId: '1:347898558963:web:751019c2434ff9b3427a86',
-    messagingSenderId: '347898558963',
-    projectId: 'eargpt-1cef3',
-    authDomain: 'eargpt-1cef3.firebaseapp.com',
-    storageBucket: 'eargpt-1cef3.firebasestorage.app',
+    apiKey: 'AIzaSyCt6H4kd7CEcbE5ikJuZzW27p6nhd7hLX8',
+    appId: '1:246277448750:web:cfe7966b21abffeed3abbf',
+    messagingSenderId: '246277448750',
+    projectId: 'eargpt-b0987',
+    authDomain: 'eargpt-b0987.firebaseapp.com',
+    storageBucket: 'eargpt-b0987.firebasestorage.app',
+    measurementId: 'G-79YYRVJELN',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBhOM8Bw8Ig0X7TWHzReWLGlgUpo5bBCKI',
-    appId: '1:347898558963:android:229f6b9ee692ac96427a86',
-    messagingSenderId: '347898558963',
-    projectId: 'eargpt-1cef3',
-    storageBucket: 'eargpt-1cef3.firebasestorage.app',
+    apiKey: 'AIzaSyA9Mbmo9YxVDINxmzkiTAaeUzCkMHSdrGc',
+    appId: '1:246277448750:android:ac136273d6b26660d3abbf',
+    messagingSenderId: '246277448750',
+    projectId: 'eargpt-b0987',
+    storageBucket: 'eargpt-b0987.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCRe1UkLugtjMs4O5N4UAekx_QZiBBSHjQ',
-    appId: '1:347898558963:ios:155c5dccb5c1f9aa427a86',
-    messagingSenderId: '347898558963',
-    projectId: 'eargpt-1cef3',
-    storageBucket: 'eargpt-1cef3.firebasestorage.app',
+    apiKey: 'AIzaSyC0ceBylHqaCICBS4l1jK8BLrgy3GUgVmg',
+    appId: '1:246277448750:ios:acabe9972b07dd34d3abbf',
+    messagingSenderId: '246277448750',
+    projectId: 'eargpt-b0987',
+    storageBucket: 'eargpt-b0987.firebasestorage.app',
     iosBundleId: 'edu.kit.teco.openWearable',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyCRe1UkLugtjMs4O5N4UAekx_QZiBBSHjQ',
-    appId: '1:347898558963:ios:155c5dccb5c1f9aa427a86',
-    messagingSenderId: '347898558963',
-    projectId: 'eargpt-1cef3',
-    storageBucket: 'eargpt-1cef3.firebasestorage.app',
-    iosBundleId: 'edu.kit.teco.openWearable',
-  );
-
-  static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyABlFDGt2_8ObSQlrPBcQ83NHt21RcUpq8',
-    appId: '1:347898558963:web:08c5c568b83fa5fd427a86',
-    messagingSenderId: '347898558963',
-    projectId: 'eargpt-1cef3',
-    authDomain: 'eargpt-1cef3.firebaseapp.com',
-    storageBucket: 'eargpt-1cef3.firebasestorage.app',
   );
 }

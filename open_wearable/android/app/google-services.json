@@ -1,0 +1,30 @@
+
+{
+  "project_info": {
+    "project_number": "246277448750",
+    "project_id": "eargpt-b0987",
+    "storage_bucket": "eargpt-b0987.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:246277448750:android:ac136273d6b26660d3abbf",
+        "android_client_info": {
+          "package_name": "edu.kit.teco.openWearable"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9Mbmo9YxVDINxmzkiTAaeUzCkMHSdrGc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

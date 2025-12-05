@@ -51,6 +51,11 @@ dependencies:
   mcumgr_flutter: ^0.4.2
   file_selector: ^1.0.3
   path_provider: ^2.1.5
+  record: ^6.1.2
+  audioplayers: ^6.5.1
+  firebase_core: ^4.2.0
+  firebase_ai: ^3.4.0
+  confirm_dialog: ^1.0.4
 
 dev_dependencies:
   flutter_test:
@@ -78,6 +83,7 @@ flutter:
   assets:
     - lib/apps/posture_tracker/assets/
     - lib/apps/heart_tracker/assets/
+    - lib/apps/eargpt_gemini_live/assets/
 
   # An image asset can refer to one or more resolution-specific "variants", seeq
   # https://flutter.dev/to/resolution-aware-images

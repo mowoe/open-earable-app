@@ -13,6 +13,9 @@ import 'package:open_earable_flutter/open_earable_flutter.dart' as oe;
 import 'models/bluetooth_auto_connector.dart';
 import 'view_models/wearables_provider.dart';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+
 // 1) Global navigator key so we can open dialogs from anywhere
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -25,9 +28,13 @@ class CustomLogFilter extends LogFilter {
   }
 }
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  oe.logger = Logger(level: Level.trace, filter: CustomLogFilter());
+  oe.logger = Logger(level: Level.info, filter: CustomLogFilter());
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(
     MultiProvider(

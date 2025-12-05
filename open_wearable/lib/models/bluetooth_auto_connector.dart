@@ -53,7 +53,7 @@ class BluetoothAutoConnector {
 
       connector.connectToSystemDevices();
     } catch (e, st) {
-      logger.w('Auto-connect tick failed: $e\n$st');
+      //logger.w('Auto-connect tick failed: $e\n$st');
     } finally {
       _running = false;
     }

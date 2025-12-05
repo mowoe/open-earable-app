@@ -11,6 +11,8 @@ import 'package:open_wearable/apps/eargpt_gemini_live/widgets/eargpt_sensor_debu
 
 import '../../widgets/devices/connect_devices_page.dart';
 
+bool noSensorMode = false;
+
 class AppInfo {
   final String logoPath;
   final String title;
@@ -68,7 +70,7 @@ List<AppInfo> _apps = [
     logoPath: "lib/apps/eargpt_gemini_live/assets/logo.png",
     title: "EarGPT Sensor Demo",
     description: "Demo app for getting Sensor data into EarGPT Gemini Live",
-    widget: SelectEarableView(startApp: 
+    widget: noSensorMode ? EargptSensorDebugPage(ppgSensor: null) : SelectEarableView(startApp: 
       (wearable, _) {
         if (wearable is SensorManager) {
           Sensor ppgSensor = (wearable as SensorManager).sensors.firstWhere(

@@ -104,7 +104,7 @@ class PpgFilter {
       buffer.removeWhere((event) => event.$1 < timestamp - windowDurationMs);
 
       if ((buffer.last.$1 - buffer.first.$1) < windowDurationMs / 2) {
-        _logger.d("waiting to fill buffer, time difference: ${buffer.last.$1 - buffer.first.$1}");
+        //_logger.d("waiting to fill buffer, time difference: ${buffer.last.$1 - buffer.first.$1}");
         continue;
       }
 
