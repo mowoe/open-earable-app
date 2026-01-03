@@ -56,6 +56,7 @@ dependencies:
   firebase_core: ^4.2.0
   firebase_ai: ^3.4.0
   confirm_dialog: ^1.0.4
+  lottie: ^3.3.2
 
 dev_dependencies:
   flutter_test:
