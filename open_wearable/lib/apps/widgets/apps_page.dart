@@ -70,13 +70,17 @@ List<AppInfo> _apps = [
     logoPath: "lib/apps/eargpt_gemini_live/assets/logo.png",
     title: "EarGPT Sensor Demo",
     description: "Demo app for getting Sensor data into EarGPT Gemini Live",
-    widget: noSensorMode ? EargptSensorDebugPage(ppgSensor: null) : SelectEarableView(startApp: 
+    widget: noSensorMode ? EargptSensorDebugPage(ppgSensor: null, wearable: null) : SelectEarableView(startApp: 
       (wearable, _) {
         if (wearable is SensorManager) {
-          Sensor ppgSensor = (wearable as SensorManager).sensors.firstWhere(
-            (s) => s.sensorName.toLowerCase() == "photoplethysmography".toLowerCase(),
-          );
-          return EargptSensorDebugPage(ppgSensor: ppgSensor);
+          try {
+            Sensor ppgSensor = (wearable as SensorManager).sensors.firstWhere(
+              (s) => s.sensorName.toLowerCase() == "photoplethysmography".toLowerCase(),
+            );
+            return EargptSensorDebugPage(ppgSensor: ppgSensor, wearable: wearable);
+          } catch (e) {
+             return EargptSensorDebugPage(ppgSensor: null, wearable: wearable);
+          }
         }
 
         return PlatformScaffold(
