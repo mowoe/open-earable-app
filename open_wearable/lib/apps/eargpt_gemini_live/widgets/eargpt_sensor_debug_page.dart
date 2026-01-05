@@ -18,8 +18,9 @@ import 'package:lottie/lottie.dart';
 
 class EargptSensorDebugPage extends StatefulWidget {
   final Sensor? ppgSensor;
+  final Wearable? wearable;
 
-  const EargptSensorDebugPage({super.key, required this.ppgSensor});
+  const EargptSensorDebugPage({super.key, required this.ppgSensor, required this.wearable});
 
   @override
   State<EargptSensorDebugPage> createState() => _EargptSensorDebugPageState();
@@ -60,6 +61,10 @@ class _EargptSensorDebugPageState extends State<EargptSensorDebugPage> with Tick
   bool _conversationActive = false;
   double? _cachedHeartRate;
   StreamSubscription<double>? _heartRateSubscription;
+
+  // Button handling
+  StreamSubscription<ButtonEvent>? _buttonSubscription;
+  bool _buttonPressed = false;
 
   void _syncAnimationWithRecordingState() {
     if (_isRecording && _animationController.isAnimating) {
@@ -413,12 +418,39 @@ class _EargptSensorDebugPageState extends State<EargptSensorDebugPage> with Tick
     liveGenerationConfig:
         LiveGenerationConfig(responseModalities: [ResponseModalities.audio]),
   );
+  
+  _setupButtonListener();
   }
+
+  void _setupButtonListener() {
+    if (widget.wearable != null && widget.wearable is ButtonManager) {
+      _buttonSubscription = (widget.wearable as ButtonManager).buttonEvents.listen((event) {
+        if (event == ButtonEvent.pressed) {
+           logger.i("Button Trigger: Pressed");
+           if (mounted) {
+             setState(() {
+                if (_conversationActive) {
+                  _endConversation();
+                } else {
+                  _startConversation();
+                }
+             });
+           }
+        }
+      });
+      logger.i("Button listener setup complete via ButtonManager.");
+    } else {
+      logger.w("Wearable does not support ButtonManager or is null.");
+    }
+  }
+
+
 
   @override
   void dispose() {
     _animationController.dispose();
     _heartRateSubscription?.cancel();
+    _buttonSubscription?.cancel();
     super.dispose();
   }
 
