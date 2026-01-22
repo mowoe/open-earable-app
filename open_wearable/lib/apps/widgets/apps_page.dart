@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:go_router/go_router.dart';
 import 'package:open_earable_flutter/open_earable_flutter.dart';
 import 'package:open_wearable/apps/heart_tracker/widgets/heart_tracker_page.dart';
 import 'package:open_wearable/apps/posture_tracker/model/earable_attitude_tracker.dart';
@@ -9,7 +10,6 @@ import 'package:open_wearable/apps/widgets/select_earable_view.dart';
 import 'package:open_wearable/apps/widgets/app_tile.dart';
 import 'package:open_wearable/apps/eargpt_gemini_live/widgets/eargpt_sensor_debug_page.dart';
 
-import '../../widgets/devices/connect_devices_page.dart';
 
 bool noSensorMode = false;
 
@@ -35,7 +35,7 @@ List<AppInfo> _apps = [
     widget: SelectEarableView(startApp: (wearable, sensorConfigProvider) {
       return PostureTrackerView(
         EarableAttitudeTracker(
-          wearable as SensorManager,
+          wearable.requireCapability<SensorManager>(),
           sensorConfigProvider,
           wearable.name.endsWith("L"),
         ),
@@ -48,9 +48,9 @@ List<AppInfo> _apps = [
     description: "Track your heart rate and other vitals",
     widget: SelectEarableView(
       startApp: (wearable, _) {
-        if (wearable is SensorManager) {
+        if (wearable.hasCapability<SensorManager>()) {
           //TODO: show alert if no ppg sensor is found
-          Sensor ppgSensor = (wearable as SensorManager).sensors.firstWhere(
+          Sensor ppgSensor = wearable.requireCapability<SensorManager>().sensors.firstWhere(
             (s) => s.sensorName.toLowerCase() == "photoplethysmography".toLowerCase(),
           );
           return HeartTrackerPage(ppgSensor: ppgSensor);
@@ -110,21 +110,7 @@ class AppsPage extends StatelessWidget {
             PlatformIconButton(
             icon: Icon(context.platformIcons.bluetooth),
             onPressed: () {
-              if (Theme.of(context).platform == TargetPlatform.iOS) {
-                showCupertinoModalPopup(
-                  context: context,
-                  builder: (context) => ConnectDevicesPage(),
-                );
-              } else {
-                Navigator.of(context).push(
-                  platformPageRoute(
-                    context: context,
-                    builder: (context) => const Material(
-                      child: ConnectDevicesPage(),
-                    ),
-                  ),
-                );
-              }
+              context.push('/connect-devices');
             },
           ),
         ],

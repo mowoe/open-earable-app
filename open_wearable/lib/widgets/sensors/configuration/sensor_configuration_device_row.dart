@@ -21,7 +21,8 @@ class SensorConfigurationDeviceRow extends StatefulWidget {
       _SensorConfigurationDeviceRowState();
 }
 
-class _SensorConfigurationDeviceRowState extends State<SensorConfigurationDeviceRow>
+class _SensorConfigurationDeviceRowState
+    extends State<SensorConfigurationDeviceRow>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   List<Widget> _content = [];
@@ -59,10 +60,13 @@ class _SensorConfigurationDeviceRowState extends State<SensorConfigurationDevice
               children: [
                 PlatformText(
                   device.name,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge
+                      ?.copyWith(fontWeight: FontWeight.bold),
                 ),
-                if (device is StereoDevice)
-                  StereoPosLabel(device: device as StereoDevice),
+                if (device.hasCapability<StereoDevice>())
+                  StereoPosLabel(device: device.requireCapability<StereoDevice>()),
               ],
             ),
             trailing: _buildTabBar(context),
@@ -76,31 +80,36 @@ class _SensorConfigurationDeviceRowState extends State<SensorConfigurationDevice
   Future<void> _updateContent() async {
     final Wearable device = widget.device;
 
-    if (device is! SensorConfigurationManager) {
+    if (!device.hasCapability<SensorConfigurationManager>()) {
       if (!mounted) return;
       setState(() {
         _content = [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: PlatformText("This device does not support sensors"),
+            child: PlatformText("This device does not support configuring sensors."),
           ),
         ];
       });
       return;
     }
 
-    final SensorConfigurationManager sensorManager = device as SensorConfigurationManager;
+    final SensorConfigurationManager sensorManager =
+        device.requireCapability<SensorConfigurationManager>();
 
     if (_tabController.index == 0) {
-      _buildNewTabContent(sensorManager);
+      _buildNewTabContent(device);
     } else {
       await _buildLoadTabContent(sensorManager);
     }
   }
 
-  void _buildNewTabContent(SensorConfigurationManager device) {
-    final List<Widget> content = device.sensorConfigurations
-        .map((config) => SensorConfigurationValueRow(sensorConfiguration: config))
+  void _buildNewTabContent(Wearable device) {
+    SensorConfigurationManager sensorManager =
+        device.requireCapability<SensorConfigurationManager>();
+    final List<Widget> content = sensorManager.sensorConfigurations
+        .map(
+          (config) => SensorConfigurationValueRow(sensorConfiguration: config),
+        )
         .cast<Widget>()
         .toList();
 
@@ -109,10 +118,10 @@ class _SensorConfigurationDeviceRowState extends State<SensorConfigurationDevice
       const SaveConfigRow(),
     ]);
 
-    if (device is EdgeRecorderManager) {
+    if (device.hasCapability<EdgeRecorderManager>()) {
       content.addAll([
         const Divider(),
-        EdgeRecorderPrefixRow(manager: device as EdgeRecorderManager),
+        EdgeRecorderPrefixRow(manager: device.requireCapability<EdgeRecorderManager>()),
       ]);
     }
 
@@ -145,11 +154,14 @@ class _SensorConfigurationDeviceRowState extends State<SensorConfigurationDevice
       return PlatformListTile(
         title: PlatformText(key),
         onTap: () async {
-          final config = await SensorConfigurationStorage.loadConfiguration(key);
+          final config =
+              await SensorConfigurationStorage.loadConfiguration(key);
           if (!mounted) return;
 
-          final result = await Provider.of<SensorConfigurationProvider>(context, listen: false)
-              .restoreFromJson(config);
+          final result = await Provider.of<SensorConfigurationProvider>(
+            context,
+            listen: false,
+          ).restoreFromJson(config);
 
           if (!result && mounted) {
             showPlatformDialog(
@@ -187,7 +199,7 @@ class _SensorConfigurationDeviceRowState extends State<SensorConfigurationDevice
   }
 
   Widget? _buildTabBar(BuildContext context) {
-    if (widget.device is! SensorConfigurationManager) return null;
+    if (!widget.device.hasCapability<SensorConfigurationManager>()) return null;
 
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.4,

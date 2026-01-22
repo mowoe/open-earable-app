@@ -2,15 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:logger/logger.dart';
-import 'package:open_earable_flutter/open_earable_flutter.dart';
+import 'package:open_earable_flutter/open_earable_flutter.dart' hide logger;
 import 'package:open_wearable/view_models/wearables_provider.dart';
-import 'package:open_wearable/widgets/fota/firmware_update.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/logger.dart';
 import '../../models/wearable_connector.dart';
-
-Logger _logger = Logger();
 
 /// Page for connecting to devices
 ///
@@ -112,7 +109,7 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
     _scanSubscription = _wearableManager.scanStream.listen((incomingDevice) {
       if (incomingDevice.name.isNotEmpty &&
           !discoveredDevices.any((device) => device.id == incomingDevice.id)) {
-        _logger.d('Discovered device: ${incomingDevice.name}');
+        logger.d('Discovered device: ${incomingDevice.name}');
         setState(() {
           discoveredDevices.add(incomingDevice);
         });
@@ -120,78 +117,42 @@ class _ConnectDevicesPageState extends State<ConnectDevicesPage> {
     });
   }
 
-  Future<void> _connectToDevice(DiscoveredDevice device, BuildContext context) async {
+  Future<void> _connectToDevice(
+    DiscoveredDevice device,
+    BuildContext context,
+  ) async {
     setState(() {
       connectingDevices[device.id] = true;
     });
 
     try {
       WearableConnector connector = context.read<WearableConnector>();
-      Wearable wearable = await connector.connect(device);
+      await connector.connect(device);
       setState(() {
         discoveredDevices.remove(device);
       });
-      checkForNewerFirmware(wearable);
     } catch (e) {
-      _logger.e('Failed to connect to device: ${device.name}, error: $e');
-    } finally {
-      setState(() {
-        connectingDevices.remove(device.id);
-      });
-    }
-  }
-
-  void checkForNewerFirmware(Wearable wearable) async {
-    // TODO: move this to wearablesProvider
-    _logger.d('Checking for newer firmware for ${wearable.name}');
-    if (wearable is DeviceFirmwareVersion) {
-      final currentVersion =
-          await (wearable as DeviceFirmwareVersion).readDeviceFirmwareVersion();
-      if (currentVersion == null || currentVersion.isEmpty) {
-        return;
-      }
-      final firmwareImageRepository = FirmwareImageRepository();
-      var latestVersion = await firmwareImageRepository
-          .getLatestFirmwareVersion()
-          .then((version) => version.toString());
-      if (firmwareImageRepository.isNewerVersion(
-        latestVersion,
-        currentVersion,
-      )) {
-        print("Checking");
-        if (!mounted) return;
-        showDialog(
+      String message = _wearableManager.deviceErrorMessage(e, device.name);
+      logger.e('Failed to connect to device: ${device.name}, error: $message');
+      if (context.mounted) {
+        showPlatformDialog(
           context: context,
           builder: (context) => PlatformAlertDialog(
-            title: PlatformText('Firmware Update Available'),
-            content: PlatformText(
-              'A newer firmware version ($latestVersion) is available. You are using version $currentVersion.',
-            ),
+            title: PlatformText('Connection Error'),
+            content: PlatformText(message),
             actions: [
-              PlatformTextButton(
+              PlatformDialogAction(
                 onPressed: () => Navigator.of(context).pop(),
-                child: PlatformText('Later'),
-              ),
-              PlatformTextButton(
-                onPressed: () {
-                  Provider.of<FirmwareUpdateRequestProvider>(
-                    context,
-                    listen: false,
-                  ).setSelectedPeripheral(wearable);
-                  Navigator.of(context).pop();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const FirmwareUpdateWidget(),
-                    ),
-                  );
-                },
-                child: PlatformText('Update Now'),
+                child: PlatformText('OK'),
               ),
             ],
           ),
         );
       }
+    } finally {
+      setState(() {
+        connectingDevices.remove(device.id);
+      });
     }
   }
 
