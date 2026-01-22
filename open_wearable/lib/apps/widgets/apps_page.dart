@@ -10,7 +10,6 @@ import 'package:open_wearable/apps/widgets/select_earable_view.dart';
 import 'package:open_wearable/apps/widgets/app_tile.dart';
 import 'package:open_wearable/apps/eargpt_gemini_live/widgets/eargpt_sensor_debug_page.dart';
 
-
 bool noSensorMode = false;
 
 class AppInfo {
@@ -32,15 +31,17 @@ List<AppInfo> _apps = [
     logoPath: "lib/apps/posture_tracker/assets/logo.png",
     title: "Posture Tracker",
     description: "Get feedback on bad posture",
-    widget: SelectEarableView(startApp: (wearable, sensorConfigProvider) {
-      return PostureTrackerView(
-        EarableAttitudeTracker(
-          wearable.requireCapability<SensorManager>(),
-          sensorConfigProvider,
-          wearable.name.endsWith("L"),
-        ),
-      );
-    },),
+    widget: SelectEarableView(
+      startApp: (wearable, sensorConfigProvider) {
+        return PostureTrackerView(
+          EarableAttitudeTracker(
+            wearable.requireCapability<SensorManager>(),
+            sensorConfigProvider,
+            wearable.name.endsWith("L"),
+          ),
+        );
+      },
+    ),
   ),
   AppInfo(
     logoPath: "lib/apps/heart_tracker/assets/logo.png",
@@ -50,9 +51,12 @@ List<AppInfo> _apps = [
       startApp: (wearable, _) {
         if (wearable.hasCapability<SensorManager>()) {
           //TODO: show alert if no ppg sensor is found
-          Sensor ppgSensor = wearable.requireCapability<SensorManager>().sensors.firstWhere(
-            (s) => s.sensorName.toLowerCase() == "photoplethysmography".toLowerCase(),
-          );
+          Sensor ppgSensor =
+              wearable.requireCapability<SensorManager>().sensors.firstWhere(
+                    (s) =>
+                        s.sensorName.toLowerCase() ==
+                        "photoplethysmography".toLowerCase(),
+                  );
           return HeartTrackerPage(ppgSensor: ppgSensor);
         }
         return PlatformScaffold(
@@ -67,35 +71,58 @@ List<AppInfo> _apps = [
     ),
   ),
   AppInfo(
-    logoPath: "lib/apps/eargpt_gemini_live/assets/logo.png",
-    title: "EarGPT Sensor Demo",
-    description: "Demo app for getting Sensor data into EarGPT Gemini Live",
-    widget: noSensorMode ? EargptSensorDebugPage(ppgSensor: null, wearable: null) : SelectEarableView(startApp: 
-      (wearable, _) {
-        if (wearable is SensorManager) {
-          try {
-            Sensor ppgSensor = (wearable as SensorManager).sensors.firstWhere(
-              (s) => s.sensorName.toLowerCase() == "photoplethysmography".toLowerCase(),
-            );
-            return EargptSensorDebugPage(ppgSensor: ppgSensor, wearable: wearable);
-          } catch (e) {
-             return EargptSensorDebugPage(ppgSensor: null, wearable: wearable);
-          }
-        }
+      logoPath: "lib/apps/eargpt_gemini_live/assets/logo.png",
+      title: "EarGPT Sensor Demo",
+      description: "Demo app for getting Sensor data into EarGPT Gemini Live",
+      widget: noSensorMode
+          ? EargptSensorDebugPage(
+              ppgSensor: null,
+              wearable: null,
+              skinTempSensor: null,
+            )
+          : SelectEarableView(startApp: (wearable, sensorConfigProvider) {
+              if (wearable.hasCapability<SensorManager>()) {
+                try {
+                  Sensor ppgSensor = wearable
+                      .requireCapability<SensorManager>()
+                      .sensors
+                      .firstWhere(
+                        (s) =>
+                            s.sensorName.toLowerCase() ==
+                            "photoplethysmography".toLowerCase(),
+                      );
 
-        return PlatformScaffold(
-          appBar: PlatformAppBar(
-            title: PlatformText("EarGPT Sensor Demo"),
-          ),
-          body: Center(
-            child: PlatformText("No PPG Sensor Found"),
-          ),
-        );
+                  Sensor skinTempSensor = wearable
+                      .requireCapability<SensorManager>()
+                      .sensors
+                      .firstWhere(
+                        (s) =>
+                            s.sensorName.toLowerCase() ==
+                            "optical_temperature_sensor".toLowerCase(),
+                      );
+                  return EargptSensorDebugPage(
+                      ppgSensor: ppgSensor,
+                      skinTempSensor: skinTempSensor,
+                      wearable: wearable);
+                } catch (e) {
+                  return EargptSensorDebugPage(
+                      ppgSensor: null,
+                      skinTempSensor: null,
+                      wearable: wearable);
+                }
+              }
 
-      }
-    )
-    // EargptSensorDebugPage(ppgSensor: null)
-  )
+              return PlatformScaffold(
+                appBar: PlatformAppBar(
+                  title: PlatformText("EarGPT Sensor Demo"),
+                ),
+                body: Center(
+                  child: PlatformText("No PPG Sensor Found"),
+                ),
+              );
+            })
+      // EargptSensorDebugPage(ppgSensor: null)
+      )
 ];
 
 class AppsPage extends StatelessWidget {
@@ -107,7 +134,7 @@ class AppsPage extends StatelessWidget {
       appBar: PlatformAppBar(
         title: PlatformText("Apps"),
         trailingActions: [
-            PlatformIconButton(
+          PlatformIconButton(
             icon: Icon(context.platformIcons.bluetooth),
             onPressed: () {
               context.push('/connect-devices');
