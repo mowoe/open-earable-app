@@ -26,13 +26,17 @@ class _SettingsViewState extends State<SettingsView> {
     super.initState();
     _viewModel = widget._viewModel;
     _rollAngleThresholdController = TextEditingController(
-        text: _viewModel.badPostureSettings.rollAngleThreshold.toString(),);
+      text: _viewModel.badPostureSettings.rollAngleThreshold.toString(),
+    );
     _pitchAngleThresholdController = TextEditingController(
-        text: _viewModel.badPostureSettings.pitchAngleThreshold.toString(),);
+      text: _viewModel.badPostureSettings.pitchAngleThreshold.toString(),
+    );
     _badPostureTimeThresholdController = TextEditingController(
-        text: _viewModel.badPostureSettings.timeThreshold.toString(),);
+      text: _viewModel.badPostureSettings.timeThreshold.toString(),
+    );
     _goodPostureTimeThresholdController = TextEditingController(
-        text: _viewModel.badPostureSettings.resetTimeThreshold.toString(),);
+      text: _viewModel.badPostureSettings.resetTimeThreshold.toString(),
+    );
   }
 
   @override
@@ -40,11 +44,12 @@ class _SettingsViewState extends State<SettingsView> {
     return PlatformScaffold(
       appBar: PlatformAppBar(title: PlatformText("Posture Tracker Settings")),
       body: ChangeNotifierProvider<PostureTrackerViewModel>.value(
-          value: _viewModel,
-          builder: (context, child) => Consumer<PostureTrackerViewModel>(
-                builder: (context, postureTrackerViewModel, child) =>
-                    _buildSettingsView(),
-              ),),
+        value: _viewModel,
+        builder: (context, child) => Consumer<PostureTrackerViewModel>(
+          builder: (context, postureTrackerViewModel, child) =>
+              _buildSettingsView(),
+        ),
+      ),
       backgroundColor: Theme.of(context).colorScheme.surface,
     );
   }
@@ -53,163 +58,213 @@ class _SettingsViewState extends State<SettingsView> {
     return Padding(
       padding: EdgeInsets.all(10),
       child: Column(
-      children: [
-        Card(
-          child: PlatformListTile(
-            title: PlatformText("Status"),
-            trailing: PlatformText(_viewModel.isTracking
-                ? "Tracking"
-                : _viewModel.isAvailable
-                    ? "Available"
-                    : "Unavailable",),
+        children: [
+          Card(
+            child: PlatformListTile(
+              title: PlatformText("Status"),
+              trailing: PlatformText(
+                _viewModel.isTracking
+                    ? "Tracking"
+                    : _viewModel.isAvailable
+                        ? "Available"
+                        : "Unavailable",
+              ),
+            ),
           ),
-        ),
-        Card(
-          child: Column(children: [
-            // add a switch to control the `isActive` property of the `BadPostureSettings`
-            PlatformListTile(
-              title: PlatformText("Bad Posture Reminder"),
-              trailing: PlatformSwitch(
-                value: _viewModel.badPostureSettings.isActive,
-                onChanged: (value) {
-                  BadPostureSettings settings = _viewModel.badPostureSettings;
-                  settings.isActive = value;
-                  _viewModel.setBadPostureSettings(settings);
-                },
+          Card(
+            child: Column(
+              children: [
+                // add a switch to control the `isActive` property of the `BadPostureSettings`
+                PlatformListTile(
+                  title: PlatformText("Bad Posture Reminder"),
+                  trailing: PlatformSwitch(
+                    value: _viewModel.badPostureSettings.isActive,
+                    onChanged: (value) {
+                      BadPostureSettings settings =
+                          _viewModel.badPostureSettings;
+                      settings.isActive = value;
+                      _viewModel.setBadPostureSettings(settings);
+                    },
+                  ),
+                ),
+                Visibility(
+                  visible: _viewModel.badPostureSettings.isActive,
+                  child: Column(
+                    children: [
+                      PlatformListTile(
+                        title:
+                            PlatformText("Roll Angle Threshold (in degrees)"),
+                        trailing: SizedBox(
+                          height: 37.0,
+                          width: 52,
+                          //TODO: use cupertino text field on ios
+                          child: TextField(
+                            controller: _rollAngleThresholdController,
+                            textAlign: TextAlign.end,
+                            style: TextStyle(color: Colors.black),
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.all(10),
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.never,
+                              border: OutlineInputBorder(),
+                              labelText: 'Roll',
+                              filled: true,
+                              labelStyle: TextStyle(color: Colors.black),
+                              fillColor: Colors.white,
+                            ),
+                            keyboardType: TextInputType.number,
+                            onChanged: (_) {
+                              _updatePostureSettings();
+                            },
+                          ),
+                        ),
+                      ),
+                      PlatformListTile(
+                        title:
+                            PlatformText("Pitch Angle Threshold (in degrees)"),
+                        trailing: SizedBox(
+                          height: 37.0,
+                          width: 52,
+                          //TODO: use cupertino text field on ios
+                          child: TextField(
+                            controller: _pitchAngleThresholdController,
+                            textAlign: TextAlign.end,
+                            style: TextStyle(color: Colors.black),
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.all(10),
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.never,
+                              border: OutlineInputBorder(),
+                              labelText: 'Pitch',
+                              filled: true,
+                              labelStyle: TextStyle(color: Colors.black),
+                              fillColor: Colors.white,
+                            ),
+                            keyboardType: TextInputType.number,
+                            onChanged: (_) {
+                              _updatePostureSettings();
+                            },
+                          ),
+                        ),
+                      ),
+                      PlatformListTile(
+                        title: PlatformText(
+                            "Bad Posture Time Threshold (in seconds)"),
+                        trailing: SizedBox(
+                          height: 37.0,
+                          width: 52,
+                          //TODO: use cupertino text field on ios
+                          child: TextField(
+                            controller: _badPostureTimeThresholdController,
+                            textAlign: TextAlign.end,
+                            style: TextStyle(color: Colors.black),
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.all(10),
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.never,
+                              border: OutlineInputBorder(),
+                              labelText: 'Seconds',
+                              filled: true,
+                              labelStyle: TextStyle(color: Colors.black),
+                              fillColor: Colors.white,
+                            ),
+                            keyboardType: TextInputType.number,
+                            onChanged: (_) {
+                              _updatePostureSettings();
+                            },
+                          ),
+                        ),
+                      ),
+                      PlatformListTile(
+                        title: PlatformText(
+                            "Good Posture Time Threshold (in seconds)"),
+                        trailing: SizedBox(
+                          height: 37.0,
+                          width: 52,
+                          //TODO: use cupertino text field on ios
+                          child: TextField(
+                            controller: _goodPostureTimeThresholdController,
+                            textAlign: TextAlign.end,
+                            style: TextStyle(color: Colors.black),
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.all(10),
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.never,
+                              border: OutlineInputBorder(),
+                              labelText: 'Seconds',
+                              filled: true,
+                              labelStyle: TextStyle(color: Colors.black),
+                              fillColor: Colors.white,
+                            ),
+                            keyboardType: TextInputType.number,
+                            onChanged: (_) {
+                              _updatePostureSettings();
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: PlatformElevatedButton(
+                    color: _viewModel.isTracking
+                        ? Colors.green[300]
+                        : Colors.blue[300],
+                    onPressed: _viewModel.isTracking
+                        ? () {
+                            _viewModel.calibrate();
+                            Navigator.of(context).pop();
+                          }
+                        : () => _viewModel.startTracking(),
+                    child: PlatformText(
+                      _viewModel.isTracking
+                          ? "Calibrate as Main Posture"
+                          : "Start Calibration",
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Show calibration status
+          if (_viewModel.hasLoadedCalibration)
+            Padding(
+              padding: EdgeInsets.only(top: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.check_circle, color: Colors.green, size: 16),
+                  SizedBox(width: 4),
+                  PlatformText(
+                    "Saved calibration loaded",
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontSize: 12,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  PlatformTextButton(
+                    onPressed: () async {
+                      await _viewModel.clearCalibration();
+                    },
+                    child: PlatformText(
+                      "Clear",
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  ),
+                ],
               ),
             ),
-            Visibility(
-                visible: _viewModel.badPostureSettings.isActive,
-                child: Column(children: [
-                  PlatformListTile(
-                    title: PlatformText("Roll Angle Threshold (in degrees)"),
-                    trailing: SizedBox(
-                      height: 37.0,
-                      width: 52,
-                      //TODO: use cupertino text field on ios
-                      child: TextField(
-                        controller: _rollAngleThresholdController,
-                        textAlign: TextAlign.end,
-                        style: TextStyle(color: Colors.black),
-                        decoration: InputDecoration(
-                            contentPadding: EdgeInsets.all(10),
-                            floatingLabelBehavior:
-                                FloatingLabelBehavior.never,
-                            border: OutlineInputBorder(),
-                            labelText: 'Roll',
-                            filled: true,
-                            labelStyle: TextStyle(color: Colors.black),
-                            fillColor: Colors.white,),
-                        keyboardType: TextInputType.number,
-                        onChanged: (_) {
-                          _updatePostureSettings();
-                        },
-                      ),
-                    ),
-                  ),
-                  PlatformListTile(
-                    title: PlatformText("Pitch Angle Threshold (in degrees)"),
-                    trailing: SizedBox(
-                      height: 37.0,
-                      width: 52,
-                      //TODO: use cupertino text field on ios
-                      child: TextField(
-                        controller: _pitchAngleThresholdController,
-                        textAlign: TextAlign.end,
-                        style: TextStyle(color: Colors.black),
-                        decoration: InputDecoration(
-                            contentPadding: EdgeInsets.all(10),
-                            floatingLabelBehavior:
-                                FloatingLabelBehavior.never,
-                            border: OutlineInputBorder(),
-                            labelText: 'Pitch',
-                            filled: true,
-                            labelStyle: TextStyle(color: Colors.black),
-                            fillColor: Colors.white,),
-                        keyboardType: TextInputType.number,
-                        onChanged: (_) {
-                          _updatePostureSettings();
-                        },
-                      ),
-                    ),
-                  ),
-                  PlatformListTile(
-                    title: PlatformText("Bad Posture Time Threshold (in seconds)"),
-                    trailing: SizedBox(
-                      height: 37.0,
-                      width: 52,
-                      //TODO: use cupertino text field on ios
-                      child: TextField(
-                        controller: _badPostureTimeThresholdController,
-                        textAlign: TextAlign.end,
-                        style: TextStyle(color: Colors.black),
-                        decoration: InputDecoration(
-                            contentPadding: EdgeInsets.all(10),
-                            floatingLabelBehavior:
-                                FloatingLabelBehavior.never,
-                            border: OutlineInputBorder(),
-                            labelText: 'Seconds',
-                            filled: true,
-                            labelStyle: TextStyle(color: Colors.black),
-                            fillColor: Colors.white,),
-                        keyboardType: TextInputType.number,
-                        onChanged: (_) {
-                          _updatePostureSettings();
-                        },
-                      ),
-                    ),
-                  ),
-                  PlatformListTile(
-                    title: PlatformText("Good Posture Time Threshold (in seconds)"),
-                    trailing: SizedBox(
-                      height: 37.0,
-                      width: 52,
-                      //TODO: use cupertino text field on ios
-                      child: TextField(
-                        controller: _goodPostureTimeThresholdController,
-                        textAlign: TextAlign.end,
-                        style: TextStyle(color: Colors.black),
-                        decoration: InputDecoration(
-                            contentPadding: EdgeInsets.all(10),
-                            floatingLabelBehavior:
-                                FloatingLabelBehavior.never,
-                            border: OutlineInputBorder(),
-                            labelText: 'Seconds',
-                            filled: true,
-                            labelStyle: TextStyle(color: Colors.black),
-                            fillColor: Colors.white,),
-                        keyboardType: TextInputType.number,
-                        onChanged: (_) {
-                          _updatePostureSettings();
-                        },
-                      ),
-                    ),
-                  ),
-                ],),),
-          ],),),
-        Padding(
-          padding: EdgeInsets.only(top: 8.0),
-          child: Row(children: [
-            Expanded(
-              child: PlatformElevatedButton(
-                color: _viewModel.isTracking
-                    ? Colors.green[300]
-                    : Colors.blue[300],
-                onPressed: _viewModel.isTracking
-                    ? () {
-                        _viewModel.calibrate();
-                        Navigator.of(context).pop();
-                      }
-                    : () => _viewModel.startTracking(),
-                child: PlatformText(_viewModel.isTracking
-                    ? "Calibrate as Main Posture"
-                    : "Start Calibration",),
-              ),
-            ),
-          ],),
-        ),
-      ],
-    ),
+        ],
+      ),
     );
   }
 

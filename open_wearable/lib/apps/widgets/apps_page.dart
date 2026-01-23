@@ -79,6 +79,7 @@ List<AppInfo> _apps = [
               ppgSensor: null,
               wearable: null,
               skinTempSensor: null,
+              attitudeTracker: null as dynamic,
             )
           : SelectEarableView(startApp: (wearable, sensorConfigProvider) {
               if (wearable.hasCapability<SensorManager>()) {
@@ -103,11 +104,17 @@ List<AppInfo> _apps = [
                   return EargptSensorDebugPage(
                       ppgSensor: ppgSensor,
                       skinTempSensor: skinTempSensor,
+                      attitudeTracker: EarableAttitudeTracker(
+                        wearable as SensorManager,
+                        sensorConfigProvider,
+                        wearable.name.endsWith("L"),
+                      ),
                       wearable: wearable);
                 } catch (e) {
                   return EargptSensorDebugPage(
                       ppgSensor: null,
                       skinTempSensor: null,
+                      attitudeTracker: null as dynamic,
                       wearable: wearable);
                 }
               }

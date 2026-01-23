@@ -15,6 +15,8 @@ class PostureTrackerViewModel with ChangeNotifier {
   final AttitudeTracker _attitudeTracker;
   final BadPostureReminder _badPostureReminder;
   bool _isDisposed = false;
+  bool _hasLoadedCalibration = false;
+
   PostureTrackerViewModel(this._attitudeTracker, this._badPostureReminder) {
     // _attitudeTracker.didChangeAvailability = (_) {
     //   if (!_isDisposed) {
@@ -25,12 +27,29 @@ class PostureTrackerViewModel with ChangeNotifier {
 
     _attitudeTracker.listen((attitude) {
       _attitude = Attitude(
-          roll: attitude.roll, pitch: attitude.pitch, yaw: attitude.yaw,);
+        roll: attitude.roll,
+        pitch: attitude.pitch,
+        yaw: attitude.yaw,
+      );
       if (!_isDisposed) {
         notifyListeners();
       }
     });
+
+    // Load saved calibration on initialization
+    _loadSavedCalibration();
   }
+
+  /// Loads saved calibration data from storage
+  Future<void> _loadSavedCalibration() async {
+    _hasLoadedCalibration = await _attitudeTracker.loadCalibration();
+    if (_hasLoadedCalibration && !_isDisposed) {
+      notifyListeners();
+    }
+  }
+
+  /// Returns true if a saved calibration was loaded
+  bool get hasLoadedCalibration => _hasLoadedCalibration;
 
   void startTracking() {
     _attitudeTracker.start();
@@ -50,6 +69,15 @@ class PostureTrackerViewModel with ChangeNotifier {
 
   void calibrate() {
     _attitudeTracker.calibrateToCurrentAttitude();
+  }
+
+  /// Clears the saved calibration
+  Future<void> clearCalibration() async {
+    await _attitudeTracker.clearCalibration();
+    _hasLoadedCalibration = false;
+    if (!_isDisposed) {
+      notifyListeners();
+    }
   }
 
   void setBadPostureSettings(BadPostureSettings settings) {

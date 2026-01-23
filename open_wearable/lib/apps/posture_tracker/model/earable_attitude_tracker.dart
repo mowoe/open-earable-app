@@ -24,7 +24,8 @@ class EarableAttitudeTracker extends AttitudeTracker {
 
   final bool _isLeft;
 
-  EarableAttitudeTracker(this._sensorManager, this._sensorConfigurationProvider, this._isLeft);
+  EarableAttitudeTracker(
+      this._sensorManager, this._sensorConfigurationProvider, this._isLeft);
 
   @override
   void start() {
@@ -33,27 +34,36 @@ class EarableAttitudeTracker extends AttitudeTracker {
       return;
     }
 
-    final Sensor accelSensor = _sensorManager.sensors.firstWhere((s) => s.sensorName.toLowerCase() == "accelerometer".toLowerCase());
+    final Sensor accelSensor = _sensorManager.sensors.firstWhere(
+        (s) => s.sensorName.toLowerCase() == "accelerometer".toLowerCase());
 
     final Set<SensorConfiguration> configurations = {};
     configurations.addAll(accelSensor.relatedConfigurations);
 
     for (final SensorConfiguration configuration in configurations) {
-      if (configuration is ConfigurableSensorConfiguration && configuration.availableOptions.contains(StreamSensorConfigOption())) {
-        _sensorConfigurationProvider.addSensorConfigurationOption(configuration, StreamSensorConfigOption());
+      if (configuration is ConfigurableSensorConfiguration &&
+          configuration.availableOptions.contains(StreamSensorConfigOption())) {
+        _sensorConfigurationProvider.addSensorConfigurationOption(
+            configuration, StreamSensorConfigOption());
       }
-      List<SensorConfigurationValue> values = _sensorConfigurationProvider.getSensorConfigurationValues(configuration, distinct: true);
-      _sensorConfigurationProvider.addSensorConfiguration(configuration, values.first);
-      configuration.setConfiguration(_sensorConfigurationProvider.getSelectedConfigurationValue(configuration)!);
+      List<SensorConfigurationValue> values = _sensorConfigurationProvider
+          .getSensorConfigurationValues(configuration, distinct: true);
+      _sensorConfigurationProvider.addSensorConfiguration(
+          configuration, values.first);
+      configuration.setConfiguration(_sensorConfigurationProvider
+          .getSelectedConfigurationValue(configuration)!);
     }
 
-    calibrate(
-      Attitude(
-        roll: pi / 2 * (_isLeft ? -1 : 1),
-        pitch: 0.0,
-        yaw: 0.0,
-      ),
-    );
+    // Apply a default reference only if no calibration exists yet
+    if (!hasCalibration) {
+      calibrate(
+        Attitude(
+          roll: pi / 2 * (_isLeft ? -1 : 1),
+          pitch: 0.0,
+          yaw: 0.0,
+        ),
+      );
+    }
 
     _subscription = accelSensor.sensorStream.listen((data) {
       if (data is SensorDoubleValue) {
