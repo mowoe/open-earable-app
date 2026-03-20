@@ -12,6 +12,8 @@ import 'package:open_wearable/widgets/app_banner.dart';
 import 'package:open_wearable/widgets/global_app_banner_overlay.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import 'models/bluetooth_auto_connector.dart';
 import 'models/logger.dart';
@@ -20,6 +22,9 @@ import 'view_models/wearables_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   LogFileManager logFileManager = await LogFileManager.create();
   initOpenWearableLogger(logFileManager.libLogger);
   initLogger(logFileManager.logger);
@@ -98,7 +103,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       );
     });
 
-    _wearableProvEventSub = wearablesProvider.wearableEventStream.listen((event) {
+    _wearableProvEventSub =
+        wearablesProvider.wearableEventStream.listen((event) {
       if (!mounted) return;
 
       // Handle firmware update available events with a dialog
@@ -127,7 +133,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                   child: const Text('Update Now'),
                   onPressed: () {
                     // Set the selected peripheral for firmware update
-                    final updateProvider = Provider.of<FirmwareUpdateRequestProvider>(
+                    final updateProvider =
+                        Provider.of<FirmwareUpdateRequestProvider>(
                       rootNavigatorKey.currentContext!,
                       listen: false,
                     );
@@ -165,8 +172,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             content: Text(
               event.description,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: textColor,
-              ),
+                    color: textColor,
+                  ),
             ),
             backgroundColor: backgroundColor,
             key: ValueKey(id),
