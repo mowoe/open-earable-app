@@ -1,4 +1,4 @@
-# EarGemini
+# EarGPT
 
 ## Table of Contents
 
@@ -24,7 +24,7 @@
 
 ## Overview
 
-EarGPT is an in-app voice assistant integrated into the OpenWearable Flutter application. It uses the **Google Gemini Live API** (via Firebase AI) to conduct real-time, bidirectional voice conversations with the user while continuously exposing biometric sensor data — heart rate, skin temperature, and posture — as callable tools that the AI model can invoke on demand.
+EarGPT is an in-app voice assistant integrated into the OpenWearable Flutter application. It uses the **Google Gemini Live API** (via Firebase AI) to conduct real-time, bidirectional voice conversations with the user while continuously exposing biometric sensor data such as heart rate, skin temperature, and posture, as callable tools that the AI model can invoke on demand.
 
 The assistant is activated either by pressing the button on the OpenEarable device or via a floating action button in the app UI. Once active, the app streams PCM audio from the microphone to Gemini, receives streamed audio responses back, and plays them through the device speaker. Between turns, sensor readings cached by the Sensor Manager are made available to the model through a structured tool-use interface.
 
@@ -32,14 +32,14 @@ The assistant is activated either by pressing the button on the OpenEarable devi
 
 ## Project Context
 
-This module was developed as part of a university course assignment with the following stated goals:
+This module/sub-app was developed as part of the wearable computing practical course at TECO. The project called _EarGPT_ had the following stated goals:
 
 - Develop a voice assistant that considers biometric signals from a wearable device.
 - Handle audio input (Speech-to-Text) and audio output (Text-to-Speech) through the OpenEarable hardware.
 - Extract information from bio signals and encode them in a form the LLM can consume.
 - Integrate a large language model to generate contextually relevant, health-aware responses.
 
-The solution uses the Gemini `gemini-2.5-flash-native-audio-preview` model, which natively supports real-time audio streaming (Live API) and function/tool calling. This allows the assistant to answer questions like _"What is my current heart rate?"_ or _"How has my skin temperature trended this week?"_ by dynamically invoking the appropriate data retrieval tool rather than relying on pre-injected context.
+Our implementation uses the Gemini `gemini-2.5-flash-native-audio-preview` model, which natively supports real-time audio streaming (Live API) and function/tool calling. This allows the assistant to answer questions like _"What is my current heart rate?"_ or _"How has my skin temperature trended this week?"_ by dynamically invoking the appropriate data retrieval tool rather than relying on pre-injected context.
 
 ---
 
@@ -54,13 +54,13 @@ The diagram below shows the dependency relationships between the main EarGPT com
                                   │
               ┌────────────────────────────────────┐
               │            eargpt_page             │  ← Entry point (StatefulWidget)
-              └──┬──────────┬────────────┬─────────┘
-                 │          │            │
-        ┌────────▼──┐  ┌────▼───────┐  ┌─▼──────────────────┐
-        │   tools   │  │  data_     │  │  sensor_manager    │
+              └──┬──────────┬──────────────┬───────┘
+                 │          │              │
+        ┌────────▼──┐   ┌───▼────────┐   ┌─▼──────────────────┐
+        │   tools   │   │  data_     │   │  sensor_manager    │
         │           ├─▶│persistence ├─▶│                    │
-        └─────┬─────┘  └────────────┘  └────────▲───────────┘
-              └─────────────────────────────────┘
+        └─────┬─────┘   └────────────┘   └────────▲───────────┘
+              └───────────────────────────────────┘
 ```
 
 The `eargpt_page` is the root widget and the single point that constructs and wires together all other components. It owns the `EarGPTSensorManager`, `GeminiSessionManager`, `EarGPTTools`, and `EarGPTDataPersistence` instances, passing references between them as needed.
@@ -316,26 +316,16 @@ The following describes a complete conversation turn from microphone to speaker:
 
 ---
 
-## Dependency Overview
-
-| Package          | Version      | Purpose                                                           |
-| ---------------- | ------------ | ----------------------------------------------------------------- |
-| `firebase_core`  | ^4.2.0       | Firebase SDK initialisation                                       |
-| `firebase_ai`    | ^3.4.0       | Gemini Live API client (`LiveGenerativeModel`, `LiveSession`)     |
-| `record`         | ^6.1.2       | Cross-platform microphone access and PCM stream                   |
-| `audioplayers`   | ^6.5.1       | Cross-platform audio playback from in-memory bytes                |
-| `lottie`         | ^3.3.2       | JSON-based animation for the speaking indicator                   |
-| `confirm_dialog` | ^1.0.4       | Utility for confirmation dialogs                                  |
-| `path_provider`  | (transitive) | Resolves the application documents directory for `AppDataStorage` |
-
----
-
 ## Setup and Configuration
 
-**Firebase project:** The app connects to the Firebase project `eargpt-b0987`. To use your own project:
+**Firebase project:** The app needs a Firebase connection. To use your own project:
 
-1. Replace `android/app/google-services.json`, `ios/Runner/GoogleService-Info.plist`, and `lib/firebase_options.dart` with files generated for your project using the FlutterFire CLI (`flutterfire configure`).
+1. Replace `android/app/google-services.json`, `ios/Runner/GoogleService-Info.plist`, and `lib/firebase_options.dart` (autogenerated by the CLI) with files generated for your project using the FlutterFire CLI (`flutterfire configure`).
 2. Ensure the Gemini Developer API (Firebase AI) is enabled in your Firebase project console.
+
+Further documentation about the firebase integration into a flutter app can be found [here](https://firebase.google.com/docs/flutter/setup?platform=android).
+
+Additionally, the [firebase AI Live documentation](https://firebase.google.com/docs/ai-logic/live-api?api=dev#before-you-begin) is a valuable resource.
 
 **Running without a physical earable:** Set `noSensorMode = true` in `lib/apps/widgets/apps_page.dart` to launch `EargptSensorDebugPage` directly with all sensor references set to `null`. The `EarGPTSensorManager` will automatically fall back to synthetic dummy streams. Alternatively, select "Start App without Earable" in the earable selection screen.
 
